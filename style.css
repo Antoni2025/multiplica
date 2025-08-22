@@ -1,13 +1,13 @@
 :root{
-  --no: #fce4e4;
-  --no-b: #e53935;
-  --neutre: #e8f0fe;
-  --neutre-b: #1e88e5;
-  --assolit: #e6f4ea;
-  --assolit-b: #43a047;
-  --card: #fff;
-  --bord: #e0e0e0;
-  --text: #222;
+  --no: #5c1a1a;         /* Fons vermellós suau per NO */
+  --no-b: #ff6b6b;       /* Vora/text NO */
+  --neutre: #1a2a4a;     /* Fons blau fosc per NEUTRE */
+  --neutre-b: #4dabf7;   /* Vora/text NEUTRE */
+  --assolit: #1a3a1a;    /* Fons verd fosc per ASSOLIT */
+  --assolit-b: #51cf66;  /* Vora/text ASSOLIT */
+  --card: #1e1e1e;       /* Targetes fosques */
+  --bord: #444;          /* Vores suaus */
+  --text: #f0f0f0;       /* Text clar */
 }
 
 *{ box-sizing: border-box; }
@@ -18,6 +18,7 @@ body {
   margin: auto;
   padding: 20px;
   color: var(--text);
+  background-color: #121212; /* Fons general */
 }
 
 h1, h2 { margin: 10px 0 12px; }
@@ -48,6 +49,9 @@ input[type="number"] {
   font-size: 1.2rem;
   padding: 8px 10px;
   width: 140px;
+  background: #2a2a2a;
+  color: var(--text);
+  border: 1px solid var(--bord);
 }
 
 button {
@@ -55,11 +59,12 @@ button {
   padding: 8px 12px;
   border: 1px solid var(--bord);
   border-radius: 8px;
-  background: #fafafa;
+  background: #2a2a2a;
+  color: var(--text);
   cursor: pointer;
 }
-button:hover { background: #f2f2f2; }
-button.secundari { color: #555; }
+button:hover { background: #3a3a3a; }
+button.secundari { color: #ccc; }
 
 .resultat {
   text-align: center;
@@ -95,9 +100,9 @@ button.secundari { color: #555; }
 
 .item {
   margin: 4px;
-  background: #fff;
-  border-color: #bbb;
-  color: #333;
+  background: #2a2a2a;
+  border-color: var(--bord);
+  color: var(--text);
 }
 
 /* Matriu 9 columnes */
@@ -129,15 +134,15 @@ button.secundari { color: #555; }
 
 .col-no .col-cap {
   background: var(--no);
-  color: #7f1d1d;
+  color: var(--no-b);
 }
 .col-neutre .col-cap {
   background: var(--neutre);
-  color: #0d47a1;
+  color: var(--neutre-b);
 }
 .col-assolit .col-cap {
   background: var(--assolit);
-  color: #1b5e20;
+  color: var(--assolit-b);
 }
 
 .col-contingut {
@@ -154,7 +159,6 @@ button.secundari { color: #555; }
 @media (max-width: 600px) {
   .matriu { grid-template-columns: repeat(2, 1fr); }
 }
-
 
 .col-cap {
   display: flex;
@@ -183,7 +187,7 @@ button.secundari { color: #555; }
 
 .bronca p {
   font-weight: bold;
-  color: #b71c1c;
+  color: #ff6b6b;
   font-size: 1.1rem;
 }
 
@@ -194,4 +198,47 @@ button.secundari { color: #555; }
   50% { transform: translateX(5px); }
   75% { transform: translateX(-5px); }
   100% { transform: translateX(0); }
+}
+@media (max-width: 480px) {
+  body {
+    padding: 12px;
+    font-size: 1.1rem; /* Base més gran */
+  }
+
+  .pregunta {
+    font-size: 1.8rem; /* Manté bona presència */
+    line-height: 1.3;
+  }
+
+  .entrada {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  input[type="number"] {
+    width: 100%;
+    font-size: 1.2rem;
+    padding: 10px;
+  }
+
+  button {
+    width: 100%;
+    font-size: 1.2rem;
+    padding: 12px;
+  }
+
+  .matriu {
+    grid-template-columns: 1fr; /* Una sola columna */
+    gap: 12px;
+  }
+
+  .col-cap {
+    font-size: 1.5rem; /* Emoji/text clar i gran */
+    padding: 10px;
+  }
+
+  .badge {
+    font-size: 1rem;
+    padding: 6px 10px;
+  }
 }
