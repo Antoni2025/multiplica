@@ -1,0 +1,197 @@
+:root{
+  --no: #fce4e4;
+  --no-b: #e53935;
+  --neutre: #e8f0fe;
+  --neutre-b: #1e88e5;
+  --assolit: #e6f4ea;
+  --assolit-b: #43a047;
+  --card: #fff;
+  --bord: #e0e0e0;
+  --text: #222;
+}
+
+*{ box-sizing: border-box; }
+
+body {
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  max-width: 1000px;
+  margin: auto;
+  padding: 20px;
+  color: var(--text);
+}
+
+h1, h2 { margin: 10px 0 12px; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--bord);
+  border-radius: 10px;
+  padding: 14px;
+  margin: 12px 0;
+}
+
+.pregunta {
+  font-size: 2rem;
+  text-align: center;
+  margin: 8px 0 12px;
+}
+
+.entrada {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+input[type="number"] {
+  font-size: 1.2rem;
+  padding: 8px 10px;
+  width: 140px;
+}
+
+button {
+  font-size: 1rem;
+  padding: 8px 12px;
+  border: 1px solid var(--bord);
+  border-radius: 8px;
+  background: #fafafa;
+  cursor: pointer;
+}
+button:hover { background: #f2f2f2; }
+button.secundari { color: #555; }
+
+.resultat {
+  text-align: center;
+  font-weight: 600;
+  margin-top: 8px;
+  min-height: 1.4em;
+}
+
+/* Llegenda i badges */
+.badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  border: 1px solid transparent;
+}
+
+.badge-no {
+  background: var(--no);
+  border-color: var(--no-b);
+  color: var(--no-b);
+}
+.badge-neutre {
+  background: var(--neutre);
+  border-color: var(--neutre-b);
+  color: var(--neutre-b);
+}
+.badge-assolit {
+  background: var(--assolit);
+  border-color: var(--assolit-b);
+  color: var(--assolit-b);
+}
+
+.item {
+  margin: 4px;
+  background: #fff;
+  border-color: #bbb;
+  color: #333;
+}
+
+/* Matriu 9 columnes */
+.matriu {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 8px;
+}
+
+.col {
+  border: 1px solid var(--bord);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  min-height: 140px;
+}
+
+.col-cap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--bord);
+  font-weight: 600;
+  font-size: 0.9rem;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.col-no .col-cap {
+  background: var(--no);
+  color: #7f1d1d;
+}
+.col-neutre .col-cap {
+  background: var(--neutre);
+  color: #0d47a1;
+}
+.col-assolit .col-cap {
+  background: var(--assolit);
+  color: #1b5e20;
+}
+
+.col-contingut {
+  padding: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .matriu { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 600px) {
+  .matriu { grid-template-columns: repeat(2, 1fr); }
+}
+
+
+.col-cap {
+  display: flex;
+  justify-content: center; /* Centra horitzontalment */
+  align-items: center;     /* Centra verticalment */
+  padding: 8px;
+  border-bottom: 1px solid var(--bord);
+  font-size: 1.6rem;       /* Mida gran per a l’emoji */
+}
+
+.col-icona {
+  line-height: 1;
+}
+
+.bronca {
+  margin-top: 12px;
+  text-align: center;
+  animation: shake 0.4s ease-in-out;
+}
+
+.bronca img {
+  max-width: 120px;
+  display: block;
+  margin: 0 auto 8px;
+}
+
+.bronca p {
+  font-weight: bold;
+  color: #b71c1c;
+  font-size: 1.1rem;
+}
+
+/* Animació de sacseig */
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-5px); }
+  100% { transform: translateX(0); }
+}
