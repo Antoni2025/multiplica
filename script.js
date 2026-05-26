@@ -4,44 +4,90 @@ let actual = null;
 let fallades = 0;
 let tempsInici = null;
 
-const PES_NO = 500;      // Columnes 1–5 (NO ASSOLIT)
-const PES_NEUTRE = 30;    // Columnes 6–8 (NEUTRE)
-const PES_ASSOLIT = 1;   // Columna 9 (ASSOLIT)
+const CLAU_TAULA_MAX = 'taula_maxima';
+const CLAU_DADES = 'multiplicacions_v2';
 
+const PES_NO = 500;      // Columnes 1–5 (NO ASSOLIT)
+const PES_NEUTRE = 30;   // Columnes 6–8 (NEUTRE)
+const PES_ASSOLIT = 1;   // Columna 9 (ASSOLIT)
 
 // Missatges possibles del professor enfadat
 const missatgesBronca = [
-  "No siguis babau, aquesta no la pots fallar!",
-  "Aquesta no la pots fallar!",
+  "Molt malament, pesolet!",
+  "Ui ui ui, que no anem bé, pesolet!",
   "No passa res, com diu en Batman, caiem per aixecar-nos... o era l'Spiderman?",
-  "Ostres, tu... va no passa res!",
-  "Cachis la mar salada!",
-  "Va, tros de quòniam, tu pots",  
-  "Renoi!",
-  "Ets un babau integral!",
-  "No pateixis, Einstein també suspenia les mates",  
-  "Te voy a arrancar la puta cabeza!!!",
+  "Ai ai ai... una mica més de concentració!",
+  "Pesolet, això no ho pots fallar",
+  "Em posaré les ulleres de veure nens que no saben multiplicar!",
+  "Pesolet!",
+  "Pesolet, això no m'ho esperava de tu",
+  "Pesolet, aquesta ha fet plorar al nen Jesús",
+  "No m'ho puc creure... aquest no és el meu pesolet",
   "Vatua l'olla, quina llàstima"
 ];
 
-// Pots posar aquí la URL d'una imatge lliure de drets
-const imatgeBronca = "kepa.png"; // substitueix per la teva imatge
+const imatgeBronca = "mariateresa.png";
 
 
-// Inicialització de dades a localStorage (sense data.json)
+// -----------------------------
+// TAULA MÀXIMA
+// -----------------------------
+
+function demanarTaulaMaxima() {
+  let max = prompt("Fins a quina taula vols practicar? (1–9)");
+  if (!max) return;
+
+  max = parseInt(max, 10);
+  if (isNaN(max) || max < 1 || max > 9) {
+    alert("Valor incorrecte. Introdueix un número entre 1 i 9.");
+    return demanarTaulaMaxima();
+  }
+
+  localStorage.setItem(CLAU_TAULA_MAX, String(max));
+  aplicarFiltreTaulaMaxima();
+  guardar();
+  renderMatriu();
+  novaPregunta();
+}
+
+function aplicarFiltreTaulaMaxima() {
+  const max = parseInt(localStorage.getItem(CLAU_TAULA_MAX) || "9", 10);
+
+  // Filtra les existents
+  multiplicacions = multiplicacions.filter(m => m.b <= max);
+
+  // Regenera les que faltin
+  const existents = new Set(multiplicacions.map(m => `${m.a}-${m.b}`));
+
+  for (let a = 1; a <= 9; a++) {
+    for (let b = 1; b <= max; b++) {
+      const id = `${a}-${b}`;
+      if (!existents.has(id)) {
+        multiplicacions.push({ a, b, columna: 6 });
+      }
+    }
+  }
+}
+
+
+// -----------------------------
+// INICIALITZACIÓ
+// -----------------------------
+
 function initDades() {
-  const guardat = localStorage.getItem('multiplicacions_v2');
+  const guardat = localStorage.getItem(CLAU_DADES);
   if (guardat) {
     multiplicacions = JSON.parse(guardat);
   } else {
-    // Genera totes les combinacions 1..9 i posa-les a la columna 6 (NEUTRE)
     for (let a = 1; a <= 9; a++) {
       for (let b = 1; b <= 9; b++) {
         multiplicacions.push({ a, b, columna: 6 });
       }
     }
-    guardar();
   }
+
+  aplicarFiltreTaulaMaxima();
+  guardar();
 }
 
 function initSessio() {
@@ -50,10 +96,14 @@ function initSessio() {
 }
 
 function guardar() {
-  localStorage.setItem('multiplicacions_v2', JSON.stringify(multiplicacions));
+  localStorage.setItem(CLAU_DADES, JSON.stringify(multiplicacions));
 }
 
-// Utilitats de categoria i pesos
+
+// -----------------------------
+// UTILITATS
+// -----------------------------
+
 function categoriaPerColumna(col) {
   if (col <= 5) return 'NO ASSOLIT';
   if (col <= 8) return 'NEUTRE';
@@ -66,30 +116,34 @@ function pesPerColumna(col) {
   return PES_ASSOLIT;
 }
 
-// Selecció aleatòria ponderada sense crear llistes grans
 function seleccionarMultiplicacio() {
   const pesos = multiplicacions.map(m => pesPerColumna(m.columna));
   const total = pesos.reduce((s, p) => s + p, 0);
   let r = Math.random() * total;
+
   for (let i = 0; i < multiplicacions.length; i++) {
     r -= pesos[i];
     if (r <= 0) return multiplicacions[i];
   }
-  return multiplicacions[multiplicacions.length - 1]; // fallback
+  return multiplicacions[multiplicacions.length - 1];
 }
+
+
+// -----------------------------
+// FLUX PRINCIPAL
+// -----------------------------
 
 function novaPregunta() {
   actual = seleccionarMultiplicacio();
-  const el = document.getElementById('pregunta');
-  el.textContent = `${actual.a} × ${actual.b} = ?`;
+  document.getElementById('pregunta').textContent = `${actual.a} × ${actual.b} = ?`;
   document.getElementById('resposta').value = '';
-  // Mantén el missatge anterior visible (no netegem 'resultat')
   document.getElementById('resposta').focus();
 }
 
 function comprovar() {
   const input = document.getElementById('resposta');
   const valor = input.value.trim();
+
   if (valor === '') {
     document.getElementById('resultat').textContent = 'Escriu una resposta.';
     input.focus();
@@ -104,48 +158,44 @@ function comprovar() {
     document.getElementById('bronca').style.display = 'none';
     actual.columna = Math.min(9, (actual.columna || 6) + 1);
   } else {
-    // Missatge amb la resposta correcta
     document.getElementById('resultat').textContent =
       `❌ Incorrecte. La resposta correcta és ${correcte}`;
     actual.columna = 1;
     fallades++;
 
-    // Mostra la bronca
     const broncaDiv = document.getElementById('bronca');
-    const broncaImg = document.getElementById('bronca-img');
-    const broncaText = document.getElementById('bronca-text');
-
-    if (broncaDiv && broncaImg && broncaText) {
-      broncaImg.src = imatgeBronca;
-      broncaText.textContent = missatgesBronca[Math.floor(Math.random() * missatgesBronca.length)];
-      broncaDiv.style.display = 'block';
-    }
+    broncaDiv.style.display = 'block';
+    document.getElementById('bronca-img').src = imatgeBronca;
+    document.getElementById('bronca-text').textContent =
+      missatgesBronca[Math.floor(Math.random() * missatgesBronca.length)];
   }
 
-  // Desa i refresca
   guardar();
   renderMatriu();
 
-  // Si totes estan assolides (columna 9), mostra pantalla final
   if (multiplicacions.every(m => m.columna === 9)) {
     mostrarPantallaFinal();
   } else {
-    // Passa a la següent immediatament, mantenint els missatges visibles
     novaPregunta();
   }
 }
 
+
+// -----------------------------
+// MATRIU DE PROGRÉS
+// -----------------------------
+
 function iconaPerColumna(col) {
   const icones = {
-    1: '😭', // plor desconsolat
-    2: '😡', // molt enfadat
-    3: '😠', // enfadat
-    4: '😤', // bufant de ràbia
-    5: '😒', // determinat / insatisfet
-    6: '😐', // neutre
-    7: '🙂', // mig somriure
-    8: '😃', // content
-    9: '🤩'  // eufòric
+    1: '😭',
+    2: '😡',
+    3: '😠',
+    4: '😤',
+    5: '😒',
+    6: '😐',
+    7: '🙂',
+    8: '😃',
+    9: '🤩'
   };
   return icones[col] || '❓';
 }
@@ -158,9 +208,7 @@ function renderMatriu() {
     const cat = categoriaPerColumna(col);
     const colDiv = document.createElement('div');
     colDiv.className = `col ${cat === 'NO ASSOLIT' ? 'col-no' : cat === 'NEUTRE' ? 'col-neutre' : 'col-assolit'}`;
-    colDiv.setAttribute('data-col', String(col));
 
-    // Capçalera només amb l’emoji centrat
     const cap = document.createElement('div');
     cap.className = 'col-cap';
     cap.innerHTML = `<div class="col-icona">${iconaPerColumna(col)}</div>`;
@@ -183,14 +231,17 @@ function renderMatriu() {
   }
 }
 
-// Pantalla final tipus overlay (no destrueix la pàgina)
+
+// -----------------------------
+// PANTALLA FINAL
+// -----------------------------
+
 function mostrarPantallaFinal() {
   const tempsFinal = Date.now();
   const segonsTotals = Math.floor((tempsFinal - tempsInici) / 1000);
   const minuts = Math.floor(segonsTotals / 60);
   const segons = segonsTotals % 60;
 
-  // Crea overlay si no existeix
   let overlay = document.getElementById('final-overlay');
   if (!overlay) {
     overlay = document.createElement('div');
@@ -224,10 +275,8 @@ function mostrarPantallaFinal() {
     overlay.appendChild(box);
     document.body.appendChild(overlay);
 
-    // Botó per reiniciar la partida
-    const tornarBtn = document.getElementById('btn-tornar-jugar');
-    tornarBtn.addEventListener('click', () => {
-      localStorage.removeItem('multiplicacions_v2');
+    document.getElementById('btn-tornar-jugar').addEventListener('click', () => {
+      localStorage.removeItem(CLAU_DADES);
       location.reload();
     });
   } else {
@@ -235,30 +284,40 @@ function mostrarPantallaFinal() {
   }
 }
 
-// Esdeveniments
+
+// -----------------------------
+// ESDEVENIMENTS
+// -----------------------------
+
 document.addEventListener('DOMContentLoaded', () => {
+
+  if (!localStorage.getItem(CLAU_TAULA_MAX)) {
+    demanarTaulaMaxima();
+  }
+
   initDades();
   initSessio();
   renderMatriu();
   novaPregunta();
 
   document.getElementById('comprovar').addEventListener('click', comprovar);
+
   document.getElementById('resposta').addEventListener('keydown', (e) => {
     if (e.key === 'Enter') comprovar();
   });
+
   document.getElementById('reiniciar').addEventListener('click', () => {
     if (confirm('Segur que vols reiniciar el progrés?')) {
-      localStorage.removeItem('multiplicacions_v2');
+      localStorage.removeItem(CLAU_DADES);
       multiplicacions = [];
       initDades();
       initSessio();
       renderMatriu();
       novaPregunta();
-      // Neteja missatges visibles en reiniciar
-      const broncaDiv = document.getElementById('bronca');
-      if (broncaDiv) broncaDiv.style.display = 'none';
-      const res = document.getElementById('resultat');
-      if (res) res.textContent = '';
+      document.getElementById('bronca').style.display = 'none';
+      document.getElementById('resultat').textContent = '';
     }
   });
+
+  document.getElementById('canviar-taula').addEventListener('click', demanarTaulaMaxima);
 });
